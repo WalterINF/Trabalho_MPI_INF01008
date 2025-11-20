@@ -2,7 +2,7 @@
 #SBATCH --job-name=experiments
 #SBATCH --partition=hype
 #SBATCH --nodes=1
-#SBATCH --ntasks=1
+#SBATCH --ntasks=80
 #SBATCH --time=6:00:00
 #SBATCH --output=%x_%j.out
 #SBATCH --error=%x_%j.err
