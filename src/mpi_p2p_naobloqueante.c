@@ -30,6 +30,8 @@ int main(int argc, char* argv[]) {
     double* local_C = (double*)malloc((n * n / size) * sizeof(double));
 
     MPI_Request request;
+    double comm_time = 0.0;
+    double comm_start;
 
     double t1, t2;
     if(rank == 0)
@@ -37,18 +39,24 @@ int main(int argc, char* argv[]) {
 
     if (rank == 0) {
         for (int i = 1; i < size; i++) {
+            comm_start = MPI_Wtime();
             MPI_Isend(A + i * (n * n / size), n * n / size, MPI_DOUBLE, i, 0, MPI_COMM_WORLD, &request);
+            comm_time += MPI_Wtime() - comm_start;
         }
         for (int i = 0; i < n * n / size; i++) {
             local_A[i] = A[i];
         }
     } else {
+        comm_start = MPI_Wtime();
         MPI_Irecv(local_A, n * n / size, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, &request);
         MPI_Wait(&request, MPI_STATUS_IGNORE);
+        comm_time += MPI_Wtime() - comm_start;
     }
 
+    comm_start = MPI_Wtime();
     MPI_Ibcast(B, n * n, MPI_DOUBLE, 0, MPI_COMM_WORLD, &request);
     MPI_Wait(&request, MPI_STATUS_IGNORE);
+    comm_time += MPI_Wtime() - comm_start;
 
     for (int i = 0; i < n / size; i++) {
         for (int j = 0; j < n; j++) {
@@ -64,17 +72,24 @@ int main(int argc, char* argv[]) {
             C[i] = local_C[i];
         }
         for (int i = 1; i < size; i++) {
+            comm_start = MPI_Wtime();
             MPI_Irecv(C + i * (n * n / size), n * n / size, MPI_DOUBLE, i, 1, MPI_COMM_WORLD, &request);
             MPI_Wait(&request, MPI_STATUS_IGNORE);
+            comm_time += MPI_Wtime() - comm_start;
         }
     } else {
+        comm_start = MPI_Wtime();
         MPI_Isend(local_C, n * n / size, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD, &request);
         MPI_Wait(&request, MPI_STATUS_IGNORE);
+        comm_time += MPI_Wtime() - comm_start;
     }
 
     if(rank == 0){
 	t2 = MPI_Wtime();
+	printf("Matrix size: %d x %d\n", n, n);
+	printf("Number of processes: %d\n", size);
 	printf("Execution time: %.6f\n", t2-t1);
+	printf("Communication time: %.6f\n", comm_time);
     }
 
 /*

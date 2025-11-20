@@ -17,6 +17,7 @@ int main(int argc, char* argv[]) {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
+
     double *A, *B, *C;
     A = (double*)malloc(n * n * sizeof(double));
     B = (double*)malloc(n * n * sizeof(double));
@@ -28,14 +29,19 @@ int main(int argc, char* argv[]) {
 
     double* local_A = (double*)malloc((n * n / size) * sizeof(double));
     double* local_C = (double*)malloc((n * n / size) * sizeof(double));
+    double comm_time = 0.0;
 
     double t1, t2;
     if(rank == 0)
 	    t1 = MPI_Wtime();
 
-
+    double comm_start = MPI_Wtime();
     MPI_Scatter(A, n * n / size, MPI_DOUBLE, local_A, n * n / size, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    comm_time += MPI_Wtime() - comm_start;
+
+    comm_start = MPI_Wtime();
     MPI_Bcast(B, n * n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    comm_time += MPI_Wtime() - comm_start;
 
     for (int i = 0; i < n / size; i++) {
         for (int j = 0; j < n; j++) {
@@ -46,11 +52,17 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    comm_start = MPI_Wtime();
     MPI_Gather(local_C, n * n / size, MPI_DOUBLE, C, n * n / size, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    comm_time += MPI_Wtime() - comm_start;
 
     if(rank == 0){
 	    t2 = MPI_Wtime();
+        printf("Matrix size: %d x %d\n", n, n);
+        printf("Number of processes: %d\n", size);
 	    printf("Execution time: %.6f\n", t2 - t1);
+	    printf("Communication time: %.6f\n", comm_time);
+
     }
 
 /*    if (rank == 0) {
