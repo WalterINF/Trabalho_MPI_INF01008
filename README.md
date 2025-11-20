@@ -15,3 +15,24 @@
 **Análise de Desempenho:** Analisar os dados coletados para identificar tendências, gargalos e condições sob as quais um método de comunicação pode ser preferível ao outro.
 
 **Entregáveis:** Um relatório técnico contendo a metodologia de teste, os resultados experimentais e a análise de desempenho.
+
+## Estrutura do Projeto:
+
+- `src/`: Código-fonte dos algoritmos.
+- `experimental_design.csv`: Design experimental.
+- `run_experiments.py`: Script para executar os experimentos.
+- `experimental_design.py`: Script para gerar o design experimental.
+
+## Executando os experimentos:
+
+1) Gerar o design experimental:
+```bash
+python scripts/experimental_design.py
+```
+Verifique se o arquivo `experimental_design.csv` foi gerado corretamente.
+
+2) Executar os experimentos:
+```bash
+python scripts/run_experiments.py
+```
+Verifique se o arquivo `experimental_design.csv` foi atualizado com os resultados dos experimentos.

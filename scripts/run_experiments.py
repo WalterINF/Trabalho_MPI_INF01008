@@ -86,7 +86,8 @@ def main():
     counter = 1
     total_rows = len(rows)
     for row in rows:
-        print(f"Executando experimento {counter} de {total_rows}")
+        repetition = int(row.get("repetition", "1") or "1")
+        print(f"Executando experimento {counter} de {total_rows} (repetição {repetition})")
         counter += 1
         method = (row.get("mpi_method") or "").strip()
         num_proc = int(row.get("num_processes", "0"))

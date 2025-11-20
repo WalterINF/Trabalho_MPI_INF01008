@@ -43,3 +43,9 @@
 
 # build directory
 build/
+
+# report
+report/
+
+# graphs
+graphs/
