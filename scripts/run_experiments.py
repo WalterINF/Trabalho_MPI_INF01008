@@ -64,7 +64,24 @@ def parse_metrics(stdout_text: str) -> Optional[Dict[str, str]]:
 
 
 def row_has_results(row: Dict[str, str]) -> bool:
-    return all(col in row and str(row[col]).strip() != "" for col in RESULT_COLUMNS)
+    # Check if the row has the essential metrics (execution_time and communication_time)
+    # These are the actual results we care about
+    return (
+        row.get("execution_time", "").strip() != ""
+        and row.get("communication_time", "").strip() != ""
+    )
+
+
+def write_csv(rows: list, fieldnames: list):
+    """Write all rows to the CSV file."""
+    with open(CSV_PATH, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        for row in rows:
+            for col in fieldnames:
+                if col not in row:
+                    row[col] = ""
+            writer.writerow(row)
 
 
 def main():
@@ -82,10 +99,9 @@ def main():
 
         rows = list(reader)
 
-    updated_rows = []
     counter = 1
     total_rows = len(rows)
-    for row in rows:
+    for idx, row in enumerate(rows):
         repetition = int(row.get("repetition", "1") or "1")
         print(f"Executando experimento {counter} de {total_rows} (repetição {repetition})")
         counter += 1
@@ -95,14 +111,20 @@ def main():
 
         #pula se ja tem resultados
         if row_has_results(row):
+            print("Skipping existing results")
             row["status"] = row.get("status", "skipped_existing_results")
-            updated_rows.append(row)
+            rows[idx] = row
+            write_csv(rows, out_fieldnames)
             continue
 
         stdout_text, stderr_text, rc = run_experiment(method, num_proc, size)
         if rc == 0:
             if(len(stdout_text) > 200):
                 print("Mpi error")
+                row["status"] = "mpi_error"
+                row["stderr"] = (stderr_text or "").strip()[:2000]
+                rows[idx] = row
+                write_csv(rows, out_fieldnames)
                 continue
             metrics = parse_metrics(stdout_text)
             if metrics:
@@ -114,16 +136,9 @@ def main():
             row["status"] = f"rc_{rc}"
 
         row["stderr"] = (stderr_text or "").strip()[:2000]
-        updated_rows.append(row)
-
-    with open(CSV_PATH, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=out_fieldnames)
-        writer.writeheader()
-        for row in updated_rows:
-            for col in out_fieldnames:
-                if col not in row:
-                    row[col] = ""
-            writer.writerow(row)
+        rows[idx] = row
+        # Save results after each execution
+        write_csv(rows, out_fieldnames)
 
 
 if __name__ == "__main__":

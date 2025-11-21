@@ -40,8 +40,8 @@ def main():
 
     prediction_variables = {
         "mpi_method": ["coletiva", "bloqueante", "nao_bloqueante"],
-        "num_processes": [1, 2, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40],
-        "matrix_size": [128, 256, 512, 1024],
+        "num_processes": [1, 2, 4, 8, 16, 24, 32, 40],
+        "matrix_size": [128, 256, 512, 1024, 2048],
     }
 
 
@@ -51,7 +51,11 @@ def main():
     }
 
 
-    generate_full_factorial_csv(prediction_variables, response_variables)
+    generate_full_factorial_csv(
+        prediction_variables, 
+        response_variables, 
+        output_file='experimental_design.csv', 
+        repetitions=5)
 
 if __name__ == "__main__":
     main()
