@@ -66,9 +66,11 @@ def parse_metrics(stdout_text: str) -> Optional[Dict[str, str]]:
 def row_has_results(row: Dict[str, str]) -> bool:
     # Check if the row has the essential metrics (execution_time and communication_time)
     # These are the actual results we care about
+    exec_time = row.get("execution_time") or ""
+    comm_time = row.get("communication_time") or ""
     return (
-        row.get("execution_time", "").strip() != ""
-        and row.get("communication_time", "").strip() != ""
+        str(exec_time).strip() != ""
+        and str(comm_time).strip() != ""
     )
 
 
@@ -84,7 +86,37 @@ def write_csv(rows: list, fieldnames: list):
             writer.writerow(row)
 
 
+def build_project():
+    """Build the project using make."""
+    print("Building project with make...")
+    try:
+        completed = subprocess.run(
+            ["make"],
+            cwd=PROJECT_ROOT,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True,
+        )
+        print("Build completed successfully")
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"Error building project: {e.stderr}")
+        return False
+    except Exception as e:
+        print(f"Error running make: {e}")
+        return False
+
+
 def main():
+    # Build the project before running experiments
+    print("Building project...")
+    os.makedirs(BUILD_DIR, exist_ok=True)
+
+
+    if not build_project():
+        raise RuntimeError("Failed to build project. Please check the build errors above.")
+    
     if not os.path.isfile(CSV_PATH):
         raise FileNotFoundError(f"CSV not found at {CSV_PATH}")
 
