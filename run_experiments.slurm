@@ -10,6 +10,9 @@
 # Navegar para o diretório do projeto
 cd $SLURM_SUBMIT_DIR
 
+# Criar o diretório build/ se não existir
+mkdir -p build/
+
 # Compilar os códigos de src/ para build/
 echo "=== Compilando códigos ==="
 mpicc src/mpi_coletiva.c -o build/mpi_coletiva
