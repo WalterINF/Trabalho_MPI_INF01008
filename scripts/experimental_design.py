@@ -41,7 +41,7 @@ def main():
     prediction_variables = {
         "mpi_method": ["coletiva", "bloqueante", "nao_bloqueante"],
         "num_processes": [1, 2, 4, 8, 16, 24, 32, 40],
-        "matrix_size": [128, 256, 512, 1024, 2048],
+        "matrix_size": [128, 256, 512, 1024],
     }
 
 

@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH --job-name=experiments
+#SBATCH --job-name=pdp_mpi_experiments
 #SBATCH --partition=hype
 #SBATCH --nodes=1
 #SBATCH --ntasks=40
-#SBATCH --time=6:00:00
+#SBATCH --time=3:00:00
 #SBATCH --output=%x_%j.out
 #SBATCH --error=%x_%j.err
 
