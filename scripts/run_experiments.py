@@ -32,7 +32,16 @@ def run_experiment(method: str, num_processes: int, matrix_size: int) -> Tuple[s
     if not os.path.isfile(exe_path):
         return "", f"Executable not found: {exe_path}", 127
 
-    cmd = ["mpirun", "-np", str(num_processes), "--oversubscribe", exe_path, str(matrix_size)]
+    cmd = [
+        "mpirun",
+        "-np", str(num_processes),
+        "--mca", "oob_tcp_if_include", "192.168.30.0/24",
+        "--mca", "btl_tcp_if_include", "192.168.30.0/24",
+        "--mca", "btl_base_warn_component_unused", "0",
+        "--bind-to", "none",
+        "--oversubscribe",
+        exe_path, str(matrix_size)
+    ]
     try:
         completed = subprocess.run(
             cmd,
