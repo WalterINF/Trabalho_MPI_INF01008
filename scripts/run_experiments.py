@@ -19,7 +19,6 @@ RESULT_COLUMNS = [
     "execution_time",
     "communication_time",
     "status",
-    "stderr",
 ]
 
 
@@ -163,7 +162,6 @@ def main():
             if(len(stdout_text) > 200):
                 print("Mpi error")
                 row["status"] = "mpi_error"
-                row["stderr"] = (stderr_text or "").strip()[:2000]
                 rows[idx] = row
                 write_csv(rows, out_fieldnames)
                 continue
@@ -176,7 +174,6 @@ def main():
         else:
             row["status"] = f"rc_{rc}"
 
-        row["stderr"] = (stderr_text or "").strip()[:2000]
         rows[idx] = row
         # Save results after each execution
         write_csv(rows, out_fieldnames)
