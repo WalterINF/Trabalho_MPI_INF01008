@@ -12,7 +12,7 @@ CSV_PATH = os.path.join(PROJECT_ROOT, "experimental_design.csv")
 OUTPUT_DIR = os.path.join(PROJECT_ROOT, "graphs")
 
 MPI_METHODS = ["coletiva", "bloqueante", "nao_bloqueante"]
-MATRIX_SIZES = [ 1024, 512, 128]
+MATRIX_SIZES = [2400, 1600, 800]
 EXECUTION_OUTPUT_TEMPLATE = "execution_time_methods_{matrix_size}.png"
 COMMUNICATION_OUTPUT_TEMPLATE = "communication_percentage_{matrix_size}.png"
 SPEEDUP_OUTPUT_TEMPLATE = "speedup_{matrix_size}.png"
